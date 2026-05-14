@@ -7,7 +7,7 @@ Autonomy, Robotics and Controls Lab
 University of Kentucky  
 
 <p align="center">
-  <img src="images/ellip_traj.png" width="60%" />
+  <img src="images/Ellip_traj.png" width="60%" />
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@ The framework integrates the following core components:
 - **Optimal Control Allocation:** Distributes the safety-filtered forces and moments back to individual actuators, ensuring the final commands remain within physical hardware limits.
 
 <p align="center">
-  <img src="images/architecture.png" width="100%" />
+  <img src="images/Architecture.png" width="100%" />
 </p>
 
 ---
