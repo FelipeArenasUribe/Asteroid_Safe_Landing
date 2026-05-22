@@ -177,11 +177,11 @@ h_min_hist     = results["h_min"]
 
 # --- Plots ---
 
-plotting.plot_trajectory_with_body(X_hist, asteroid.main_body, az=-75, el=15, location = 'upper right', save_fig=False)
+plotting.plot_trajectory_attitude_with_body(X_hist, asteroid.main_body, index=-1, n_points=100, az=-75, el=15, location='upper right', save_fig=True, n_attitude=12, frame_scale=170)
 
 plotting.plot_w_estimates(w_hat_hist, w_bound_hist, w_hist, t_hist, save_fig=False)
 
-plotting.plot_position_attitude_error(t_hist, X_hist, spacecraft.x_f, save_fig=True)
+plotting.plot_position_attitude_error(t_hist, X_hist, spacecraft.x_f, save_fig=False)
 
 plotting.plot_state_constraints(psi_list, t_hist, save_fig=False)
 

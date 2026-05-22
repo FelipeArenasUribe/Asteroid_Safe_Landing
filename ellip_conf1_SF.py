@@ -184,7 +184,7 @@ h_min_hist     = results["h_min"]
 
 # --- Plots ---
 
-plotting.plot_trajectory_with_body(X_hist, asteroid.main_body, az=-75, el=15, location = 'upper right', save_fig=False)
+plotting.plot_trajectory_attitude_with_body(X_hist, asteroid.main_body, index=-1, n_points=100, az=-75, el=15, location='upper right', save_fig=True, n_attitude=12, frame_scale=170)
 
 plotting.plot_w_estimates(w_hat_hist, w_bound_hist, w_hist, t_hist, save_fig=False)
 
@@ -195,10 +195,6 @@ plotting.plot_state_constraints(psi_list, t_hist, save_fig=False)
 plotting.plot_virtual_controls(t_hist, u_tilde_hist, u_tilde_d_hist, labels=None, save_fig=False)
 
 plotting.plot_actuator_inputs(t_hist, u_hist, spacecraft, save_fig=False)
-
-# plotting.plot_h_softmin(t_hist, h_soft_hist, h_min_hist, save_fig=False)
-
-# plotting.plot_h_softmin_log(t_hist, h_soft_hist, h_min_hist, save_fig=False)
 
 plotting.plot_h_softmin_lambda(t_hist, h_soft_hist, h_min_hist, lambda_hist, save_fig=False)
 
