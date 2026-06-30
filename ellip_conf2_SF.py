@@ -44,7 +44,7 @@ x_0 = np.concatenate((
     )).reshape(-1, 1)  # Reshape to (18, 1)
 
 
-F_max = 100.0 # N
+F_max = 80.0 # N
 
 # Define the upper bounds
 u_max = np.array([F_max, F_max, F_max, F_max, F_max, F_max, F_max, F_max])
@@ -104,9 +104,9 @@ c_1 = 1e-3
 w_bar_0 = 1e-10
 
 # Control Dynamics
-A_c = -3 * np.eye(6)
-B_c = 3 * np.eye(6)
-sigma = 3
+A_c = np.zeros((6,6))
+B_c = np.eye(6)
+sigma = 5
 
 betas = {
     "beta_1_0": 0.1,
@@ -189,20 +189,4 @@ plotting.plot_virtual_controls(t_hist, u_tilde_hist, u_tilde_d_hist, labels=None
 
 plotting.plot_actuator_inputs(t_hist, u_hist, spacecraft, save_fig=False)
 
-# plotting.plot_h_softmin(t_hist, h_soft_hist, h_min_hist, save_fig=False)
-
-# plotting.plot_h_softmin_log(t_hist, h_soft_hist, h_min_hist, save_fig=False)
-
 plotting.plot_h_softmin_lambda(t_hist, h_soft_hist, h_min_hist, lambda_hist, save_fig=False)
-
-# --- Supplementary Plots ---
-
-# plotting.plot_position_velocity_error(t_hist, X_hist, spacecraft.x_f, save_fig=False)
-
-# plotting.plot_rotation_matrix(t_hist, X_hist.T[:, 6:15], spacecraft.x_f[6:15], save_fig=False)
-
-# plotting.plot_attitude_error_function(t_hist, X_hist.T[:, 6:15], spacecraft.x_f[6:15], save_fig=False)
-
-# plotting.plot_attitude_error_vector(t_hist, X_hist.T[:, 6:15], spacecraft.x_f[6:15], save_fig=False)
-
-# plotting.plot_angular_velocity_error(t_hist, X_hist.T[:, 6:15], X_hist.T[:, 15:18], spacecraft.x_f[6:15], spacecraft.x_f[15:18], save_fig=False)

@@ -12,6 +12,130 @@ plt.rcParams.update({
     "font.family": "serif"
 })
 
+def plot_trajectory_attitude_with_body(X_hist, main_body, index=-1, n_points=100, az=-55, el=10, location='upper right', save_fig=False, n_attitude=12, frame_scale=150):
+    """
+    Plot 3D spacecraft trajectory and attitude along with a celestial body composed of multiple sub-bodies.
+    
+    Parameters
+    ----------
+    n_attitude : int
+        Number of attitude frames to plot along the trajectory.
+    frame_scale : float
+        Size of the body-frame axes in metres (tune to your trajectory scale).
+    """
+
+    X_hist_T = X_hist.T
+    X = X_hist_T[:, 0:3]
+    R_flat = X_hist_T[:, 6:15]          # each row is a flattened 3×3 rotation matrix
+
+    fig = plt.figure(figsize=(4.0, 3.5))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # --- Plot trajectory ---
+    ax.plot(X[:, 0], X[:, 1], X[:, 2], lw=2.5, color='C0') # Slate blue
+    ax.scatter(X[0, 0], X[0, 1], X[0, 2], color='C2', s=35, label="$r(0)$")     # Professional green
+    ax.scatter(X[index, 0], X[index, 1], X[index, 2], color='C3', s=35, label="$r(t_l)$") # Professional red
+
+    # --- Plot attitude frames along the trajectory ---
+    # Choose evenly-spaced indices
+    attitude_indices = np.linspace(0, len(X) - 1, n_attitude + 2, dtype=int)[0:-1]
+
+    colors_axes = ['#FF7F0E', '#9467BD', '#17BECF']   # x, y, z body axes
+
+    for k, idx in enumerate(attitude_indices):
+        pos = X[idx]                              # spacecraft position
+        R   = R_flat[idx].reshape(3, 3)           # rotation matrix (cols = body axes in inertial frame)
+
+        for j in range(3):
+            body_axis = R[:, j]                   # j-th column = j-th body axis expressed in inertial frame
+            tip = pos + frame_scale * body_axis
+
+            ax.quiver(
+                pos[0], pos[1], pos[2],
+                body_axis[0], body_axis[1], body_axis[2],
+                length=frame_scale,
+                color=colors_axes[j],
+                linewidth=1.0,
+                arrow_length_ratio=0.25,
+                normalize=False,
+            )
+
+    # --- Plot each sub-body ---
+    u = np.linspace(0, 2*np.pi, n_points)
+    v = np.linspace(0, np.pi, n_points)
+    U, V = np.meshgrid(u, v)
+
+    for sub_body in main_body.sub_bodies:
+        if sub_body.type == 'Ellipsoid':
+            a, b, c = sub_body.dim
+            x = a * np.cos(U) * np.sin(V)
+            y = b * np.sin(U) * np.sin(V)
+            z = c * np.cos(V)
+        else:
+            x = sub_body.R * np.cos(U) * np.sin(V)
+            y = sub_body.R * np.sin(U) * np.sin(V)
+            z = sub_body.R * np.cos(V)
+
+        xyz = np.vstack((x.ravel(), y.ravel(), z.ravel()))
+        xyz_rot = sub_body.Rot_matrix @ xyz
+        xyz_rot[0, :] += sub_body.position[0]
+        xyz_rot[1, :] += sub_body.position[1]
+        xyz_rot[2, :] += sub_body.position[2]
+
+        x_rot = xyz_rot[0, :].reshape(n_points, n_points)
+        y_rot = xyz_rot[1, :].reshape(n_points, n_points)
+        z_rot = xyz_rot[2, :].reshape(n_points, n_points)
+
+        ax.plot_surface(x_rot, y_rot, z_rot, color='gray', alpha=1.0,
+                        linewidth=0, antialiased=True)
+
+    # --- Equal aspect ratio ---
+    all_points = np.vstack([X] + [sub.position.reshape(1, 3) for sub in main_body.sub_bodies])
+    x_limits = [all_points[:, 0].min(), all_points[:, 0].max()]
+    y_limits = [all_points[:, 1].min(), all_points[:, 1].max()]
+    z_limits = [all_points[:, 2].min(), all_points[:, 2].max()]
+
+    x_range = x_limits[1] - x_limits[0]
+    y_range = y_limits[1] - y_limits[0]
+    z_range = z_limits[1] - z_limits[0]
+    max_range = max(x_range, y_range, z_range)
+
+    x_middle = np.mean(x_limits)
+    y_middle = np.mean(y_limits)
+    z_middle = np.mean(z_limits)
+
+    ax.set_xlim([x_middle - max_range / 2, x_middle + max_range / 2])
+    ax.set_ylim([y_middle - max_range / 2, y_middle + max_range / 2])
+    ax.set_zlim([z_middle - max_range / 2, z_middle + max_range / 2])
+
+    # --- Labels and style ---
+    ax.set_xlabel('$r_x$ [m]', labelpad=-5, fontsize=9)
+    ax.set_ylabel('$r_y$ [m]', labelpad=-5, fontsize=9)
+    ax.set_zlabel('$r_z$ [m]', labelpad=-5, fontsize=9)
+
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(500))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(500))
+    ax.zaxis.set_major_locator(ticker.MultipleLocator(500))
+    ax.tick_params(axis='both', which='major', labelsize=8, pad=-2)
+
+    # --- Legend ---
+    ax.legend(
+        loc=location,
+        bbox_to_anchor=(0.85, 0.85),
+        fontsize=9,
+        frameon=True,
+        borderaxespad=0.1
+    )
+
+    # --- View angle ---
+    ax.view_init(elev=el, azim=az)
+
+    plt.tight_layout()
+    if save_fig:
+        fig.savefig('traj_plot.pdf', bbox_inches='tight', pad_inches=0.3)
+
+    plt.show()
+
 def plot_trajectory_with_body(X_hist, main_body, index=-1, n_points=100, az=-55, el=10, location = 'upper right', save_fig=False):
     """
     Plot 3D spacecraft trajectory along with a celestial body composed of multiple sub-bodies.
@@ -143,12 +267,14 @@ def plot_position_attitude_error(t_vec, X_traj, xf, save_fig=False):
 
     # Optimized legend spacing
     ax[0].legend(
-        loc='lower right',
+        loc='best',
         frameon=False,
         handletextpad=0.2,  # Reduces space between line and text
         labelspacing=0.075,    # Reduces vertical space between entries
         borderpad=0.3,       # Reduces whitespace inside the legend box
-        borderaxespad=0.05    # Distance from the edge of the plot
+        borderaxespad=0.05,    # Distance from the edge of the plot
+        ncol=3,
+        columnspacing=0.5
     )
 
     ax[0].grid(False)
@@ -263,13 +389,14 @@ def plot_virtual_controls(t, u_tilde, U_d_traj, labels=None, save_fig=False):
         ax[i].set_ylabel(labels[i])
         if i==0:
             ax[i].legend(
-            loc='upper left',
+            loc='best',
             frameon=False,
             handletextpad=0.2,  # Reduces space between line and text
             labelspacing=0.15,    # Reduces vertical space between entries
             borderpad=0.3,       # Reduces whitespace inside the legend box
             borderaxespad=0.025,    # Distance from the edge of the plot
-            ncol=2
+            ncol=2,
+            columnspacing=0.5
             )
         ax[i].grid(False)
         
@@ -328,9 +455,9 @@ def plot_actuator_inputs(t_hist, u_hist, spacecraft, save_fig=False):
 
         # Plot horizontal lines for limits if found
         if upper_bound is not None:
-            ax.axhline(y=upper_bound, color='r', linestyle='--', alpha=0.3)
+            ax.axhline(y=upper_bound, color='r', linestyle='--', alpha=0.6)
         if lower_bound is not None:
-            ax.axhline(y=lower_bound, color='r', linestyle='--', alpha=0.3)
+            ax.axhline(y=lower_bound, color='r', linestyle='--', alpha=0.6)
 
         # Formatting
         ax.set_ylabel(f'$u_{i+1}$')
@@ -415,13 +542,14 @@ def plot_h_softmin_lambda(t_vec, h_softmin, h_min, lambda_hist, save_fig=False):
     fig, ax = plt.subplots(2, 1, figsize=(3.5, 2.5), sharex=True)
 
     # Top Plot: h(x) comparison
-    ax[0].plot(t_vec, h_softmin, label=r'$h(\tilde{x})$', linewidth=1.5)
-    ax[0].plot(t_vec, h_min, '--', label=r'$\min(\tilde{x})$', linewidth=1.5)
+    # ax[0].plot(t_vec, h_softmin, label=r'$h(\tilde{x})$', linewidth=1.5)
+    ax[0].plot(t_vec, h_softmin, linewidth=1.5)
+    # ax[0].plot(t_vec, h_min, '--', label=r'$\min(\tilde{x})$', linewidth=1.5)
     ax[0].set_ylabel(r'$h(\tilde{x})$', fontsize=9)
     ax[0].set_xlim(t_min, t_max)
     upper_limit = np.max(h_min) * 1.1 
     ax[0].set_ylim(-0.1, upper_limit)
-    ax[0].legend(fontsize=8, loc='upper right', frameon=False)
+    # ax[0].legend(fontsize=8, loc='upper right', frameon=False)
     # ax[0].grid(True, which='both', linestyle='--', alpha=0.5)
     # ax[0].axhline(0, color='gray', linestyle='--')
 
@@ -430,7 +558,13 @@ def plot_h_softmin_lambda(t_vec, h_softmin, h_min, lambda_hist, save_fig=False):
     ax[1].set_ylabel(r'$\lambda + 1$', fontsize=9)
     ax[1].set_xlabel('$t$ (s)', fontsize=9)
     ax[1].set_xlim(t_min, t_max)
-    ax[1].grid(True, which='both', linestyle='--', alpha=0.5)
+
+    # Create ticks exactly at 10^0 (1), 10^2 (100), and 10^4 (10000)
+    my_ticks = np.logspace(0, 6, num=4)
+
+    # Apply them to your plot
+    ax[1].set_yticks(my_ticks)
+    ax[1].grid(True, which='major', linestyle='--', alpha=0.5)
 
     plt.tight_layout()
 

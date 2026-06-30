@@ -110,9 +110,9 @@ c_1 = 1e-3
 w_bar_0 = 1e-10
 
 # Control Dynamics
-A_c = -3 * np.eye(6)
-B_c = 3 * np.eye(6)
-sigma = 3
+A_c = np.zeros((6,6))
+B_c = np.eye(6)
+sigma = 5
 
 betas = {
     "beta_1_0": 0.1,
@@ -183,28 +183,16 @@ h_min_hist     = results["h_min"]
 
 # --- Plots ---
 
-plotting.plot_trajectory_attitude_with_body(X_hist, asteroid.main_body, index=-1, n_points=100, az=-72, el=10, location='upper right', save_fig=True, n_attitude=12, frame_scale=170)
+plotting.plot_trajectory_attitude_with_body(X_hist, asteroid.main_body, index=-1, n_points=100, az=-72, el=10, location='upper right', save_fig=True, n_attitude=8, frame_scale=170)
 
-plotting.plot_w_estimates(w_hat_hist, w_bound_hist, w_hist, t_hist, save_fig=False)
+plotting.plot_w_estimates(w_hat_hist, w_bound_hist, w_hist, t_hist, save_fig=True)
 
-plotting.plot_position_attitude_error(t_hist, X_hist, spacecraft.x_f, save_fig=False)
+plotting.plot_position_attitude_error(t_hist, X_hist, spacecraft.x_f, save_fig=True)
 
-plotting.plot_state_constraints(psi_list, t_hist, save_fig=False)
+plotting.plot_state_constraints(psi_list, t_hist, save_fig=True)
 
-plotting.plot_virtual_controls(t_hist, u_tilde_hist, u_tilde_d_hist, labels=None, save_fig=False)
+plotting.plot_virtual_controls(t_hist, u_tilde_hist, u_tilde_d_hist, labels=None, save_fig=True)
 
-plotting.plot_actuator_inputs(t_hist, u_hist, spacecraft, save_fig=False)
+plotting.plot_actuator_inputs(t_hist, u_hist, spacecraft, save_fig=True)
 
-plotting.plot_h_softmin_lambda(t_hist, h_soft_hist, h_min_hist, lambda_hist, save_fig=False)
-
-# --- Supplementary Plots ---
-
-# plotting.plot_position_velocity_error(t_hist, X_hist, spacecraft.x_f, save_fig=False)
-
-# plotting.plot_rotation_matrix(t_hist, X_hist.T[:, 6:15], spacecraft.x_f[6:15], save_fig=False)
-
-# plotting.plot_attitude_error_function(t_hist, X_hist.T[:, 6:15], spacecraft.x_f[6:15], save_fig=False)
-
-# plotting.plot_attitude_error_vector(t_hist, X_hist.T[:, 6:15], spacecraft.x_f[6:15], save_fig=False)
-
-# plotting.plot_angular_velocity_error(t_hist, X_hist.T[:, 6:15], X_hist.T[:, 15:18], spacecraft.x_f[6:15], spacecraft.x_f[15:18], save_fig=False)
+plotting.plot_h_softmin_lambda(t_hist, h_soft_hist, h_min_hist, lambda_hist, save_fig=True)
