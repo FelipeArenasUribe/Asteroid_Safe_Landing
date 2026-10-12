@@ -87,16 +87,16 @@ See the associated paper for details:
 
 If you find this work useful, please consider citing:
 
-<!-- **[Safe Position and Attitude Control for Landing on Small Celestial Bodies with Gravitational Uncertainty](https://arxiv.org/abs/2510.05895)**
+-- **[Safe Position and Attitude Control for Landing on Small Celestial Bodies with Gravitational Uncertainty](https://arxiv.org/abs/2610.04816)**
 
-```bash
-@misc{arenasuribe2025safelandingsmallcelestial,
-      title={Safe Landing on Small Celestial Bodies with Gravitational Uncertainty Using Disturbance Estimation and Control Barrier Functions}, 
-      author={Felipe Arenas-Uribe and T. Michael Seigler and Jesse B. Hoagg},
-      year={2025},
-      eprint={2510.05895},
-      archivePrefix={arXiv},
-      primaryClass={eess.SY},
-      url={https://arxiv.org/abs/2510.05895}, 
+```bibtex
+@misc{arenasuribe2026saferecedinghorizoncontrolfixedwing,
+  title={Safe Receding-Horizon Control of Fixed-Wing Aircraft Using Constrained Approximate Dynamic Programming},
+  author={Felipe Arenas-Uribe and Ricardo Gutierrez and Jesse B. Hoagg},
+  year={2026},
+  eprint={2610.06284},
+  archivePrefix={arXiv},
+  primaryClass={eess.SY},
+  url={https://arxiv.org/abs/2610.06284}
 }
-``` -->
+```
